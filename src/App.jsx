@@ -13,10 +13,10 @@ export default function App() {
   const [pokemonData, setPokemonData] = useState([]);
   const [gameId, setGameId] = useState(0);
   useEffect(() => {
-    //populate first time and refresh 20 random cards after each round
+    //populate first time and refresh 18 random cards after each round
     let pokemonIds = new Set();
-    while (pokemonIds.size < 20) {
-      pokemonIds.add(Math.floor(Math.random() * 151 + 1));
+    while (pokemonIds.size < 18) {
+      pokemonIds.add(Math.floor(Math.random() * 151 + 1)); //151 for old geezers like me
     }
     let pokemonIdsArray = Array.from(pokemonIds);
     let fetchArray = pokemonIdsArray.map((pokemonId) => {
@@ -53,9 +53,9 @@ export default function App() {
         const newData = [...prev];
         return shuffle(newData);
       });
-      if (clickedId.length === 19) {
+      if (clickedId.length === 17) {
         //round increase when hv 19 clicked card and not game over
-        //if set 20 here react will never trigger
+        //if set 18 here react will never trigger
         setRound((prev) => prev + 1); //trigger refresher
         setClickedId([]); //empty clickedId array after each round
       }
