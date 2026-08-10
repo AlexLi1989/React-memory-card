@@ -39,6 +39,19 @@ export default function App() {
     } else {
       setCurrentScore((prev) => prev + 1);
       setClickedId((prev) => [...prev, pokemonId]);
+      //shuffle the cards after each non-repeated click with fisher yates
+      function shuffle(array) {
+        for (let i = array.length - 1; i > 0; i--) {
+          const j = Math.floor(Math.random() * (i + 1));
+          [array[i], array[j]] = [array[j], array[i]];
+        }
+        return array;
+      }
+      //need to do a shallow copy as pokemonData is an array and react may not be able to differentiate between the original array and the shuffled array
+      setPokemonData((prev) => {
+        const newData = [...prev];
+        return shuffle(newData);
+      });
       if (clickedId.length === 19) {
         //round increase when hv 19 clicked card and not game over
         //if set 20 here react will never trigger
