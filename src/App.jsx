@@ -31,14 +31,14 @@ export default function App() {
   }, [round]);
 
   //card on click handler
-  const clickHandler = (e) => {
-    if (clickedId.includes(e.target.id)) {
+  const clickHandler = (pokemonId) => {
+    if (clickedId.includes(pokemonId)) {
       let score = currentScore;
       if (score > highScore) setHighScore(score);
       setIsGameOver(true);
     } else {
       setCurrentScore((prev) => prev + 1);
-      setClickedId((prev) => [...prev, e.target.id]);
+      setClickedId((prev) => [...prev, pokemonId]);
       if (clickedId.length === 19) {
         //round increase when hv 19 clicked card and not game over
         //if set 20 here react will never trigger
