@@ -11,6 +11,7 @@ export default function App() {
   const [isGameOver, setIsGameOver] = useState(false);
   const [round, setRound] = useState(1);
   const [pokemonData, setPokemonData] = useState([]);
+  const [gameId, setGameId] = useState(0);
   useEffect(() => {
     //populate first time and refresh 20 random cards after each round
     let pokemonIds = new Set();
@@ -28,7 +29,7 @@ export default function App() {
         setPokemonData(results);
       })
       .catch((error) => console.error("error"));
-  }, [round]);
+  }, [round, gameId]);
 
   //card on click handler
   const clickHandler = (pokemonId) => {
@@ -60,6 +61,15 @@ export default function App() {
       }
     }
   };
+
+  //modal restart game handler
+  const restartHandler = () => {
+    setCurrentScore(0);
+    setClickedId([]);
+    setIsGameOver(false);
+    setRound(1);
+    setGameId((prev) => prev + 1);
+  };
   return (
     <main>
       <h1>Alex's Memory Card Game</h1>
@@ -68,8 +78,12 @@ export default function App() {
         highScore={highScore}
         round={round}
       />
-      <Gameboard pokemonData={pokemonData} clickHandler={clickHandler} />
-      <GameOverModal isGameOver={isGameOver} />
+      <Gameboard
+        pokemonData={pokemonData}
+        clickHandler={clickHandler}
+        key={gameId}
+      />
+      <GameOverModal isGameOver={isGameOver} restartHandler={restartHandler} />
     </main>
   );
 }
