@@ -12,7 +12,13 @@ export default function App() {
   const [round, setRound] = useState(1);
   const [pokemonData, setPokemonData] = useState([]);
   const [gameId, setGameId] = useState(0);
+  const [error, setError] = useState(null);
+  const [loading, setLoading] = useState(true);
   useEffect(() => {
+    //logic to prevent race conditions and memory leak
+    let isMounted = true;
+    setLoading(true);
+
     //populate first time and refresh 18 random cards after each round
     let pokemonIds = new Set();
     while (pokemonIds.size < 18) {
@@ -21,14 +27,29 @@ export default function App() {
     let pokemonIdsArray = Array.from(pokemonIds);
     let fetchArray = pokemonIdsArray.map((pokemonId) => {
       return fetch(`https://pokeapi.co/api/v2/pokemon/${pokemonId}`).then(
-        (response) => response.json(),
+        (response) => {
+          if (response.status >= 400) {
+            throw new Error("server error");
+          }
+          return response.json();
+        },
       );
     });
     Promise.all(fetchArray)
       .then((results) => {
-        setPokemonData(results);
+        //only updates data,error and loading if still mounted
+        if (isMounted) setPokemonData(results);
       })
-      .catch((error) => console.error("error"));
+      .catch((error) => {
+        if (isMounted) setError(error);
+      })
+      .finally(() => {
+        if (isMounted) setLoading(false);
+      });
+    //cleanup function: set closure isMounted to prevent leakage
+    return () => {
+      isMounted = false;
+    };
   }, [round, gameId]);
 
   //card on click handler
@@ -70,6 +91,22 @@ export default function App() {
     setRound(1);
     setGameId((prev) => prev + 1);
   };
+  if (loading) {
+    return (
+      <div className="loading-container">
+        <div className="spinner"></div>
+        <p className="loading-text">Loading...</p>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="error-message">
+        <code>A network error was encountered</code>
+      </div>
+    );
+  }
   return (
     <main>
       <h1>Alex's Memory Card Game</h1>
